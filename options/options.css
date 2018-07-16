@@ -1,0 +1,4 @@
+body {width: 37em; font-family: "Open Sans", sans-serif; font-size: 1em; text-align:right}
+label {float: right;}
+input {margin: 0.5em; width: 10em; height: 2.5em;}
+#tag {display:disable}

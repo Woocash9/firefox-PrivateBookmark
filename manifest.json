@@ -1,0 +1,19 @@
+{
+
+    "manifest_version": 2,
+    "applications": {
+    	"gecko": {
+    		"id":"{a37678e2-6781-4f81-ba07-bf711cb608c0}"
+    	}
+    },
+    "name": "PrivateBookmark",
+    "version": "1.8",
+    "author":"Lukasz Kwiatkowski",
+    "incognito": "spanning",
+    "description": "Opens bookmark marked as private in a new private tab.",
+    "icons": {"76": "icons/private-bookmark.png"},
+    "background": {"scripts": ["background.js"]},
+    "options_ui": {"page": "options/options.html"},
+    "permissions": ["<all_urls>", "tabs", "webRequest", "webRequestBlocking", "bookmarks", "storage"]  
+  
+}
