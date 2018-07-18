@@ -3,11 +3,11 @@ const PrivateBookmarkOptions = {
     tag: document.querySelector("#tag"),
 
     storeOptions : function(){
-        browser.storage.local.set({
+        chrome.storage.local.set({
             "keyword": keyword.value,
             "tag": tag.value
         });
-        browser.runtime.sendMessage({"event":"optionsChanged"});
+        chrome.runtime.sendMessage({"event":"optionsChanged"});
     },
     
     readOptions : function(options){
@@ -21,7 +21,7 @@ const PrivateBookmarkOptions = {
     
     init : function(){
         
-        const gettingOptions = browser.storage.local.get();
+        const gettingOptions = chrome.storage.local.get();
         gettingOptions.then(PrivateBookmarkOptions.readOptions,PrivateBookmarkOptions.readError);
 
         keyword.addEventListener("blur", PrivateBookmarkOptions.storeOptions);

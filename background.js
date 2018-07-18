@@ -22,14 +22,14 @@ const PrivateBookmark = {
 		PrivateBookmark.filter = []; //clear filter
 		
 		// get whole tree and use recurency to iterate over all nodes
-	    browser.bookmarks.getTree().then(function(bookmarks){
+	    chrome.bookmarks.getTree().then(function(bookmarks){
 	    	PrivateBookmark.readBookmarkItems(bookmarks[0]); //process root node
 	    
-    		if(browser.webRequest.onBeforeRequest.hasListener(PrivateBookmark.requestCancel)){
-		    	browser.webRequest.onBeforeRequest.removeListener(PrivateBookmark.requestCancel); //remove existing listner
+    		if(chrome.webRequest.onBeforeRequest.hasListener(PrivateBookmark.requestCancel)){
+		    	chrome.webRequest.onBeforeRequest.removeListener(PrivateBookmark.requestCancel); //remove existing listner
     		}
 	    	if(Object.keys(PrivateBookmark.filter).length>0){ //cache is not empty thus we need listner for webRequests
-		    	browser.webRequest.onBeforeRequest.addListener(PrivateBookmark.requestCancel, {urls: PrivateBookmark.filter}, ["blocking"]);
+		    	chrome.webRequest.onBeforeRequest.addListener(PrivateBookmark.requestCancel, {urls: PrivateBookmark.filter}, ["blocking"]);
 	    	}
 	    })
 	},
@@ -53,10 +53,10 @@ const PrivateBookmark = {
 		
 	    PrivateBookmark.currentURL = requestDetails.url; //save URL beeing processed
         if (PrivateBookmark.privateWindow==-1){
-            browser.windows.create({incognito:true,url:requestDetails.url}); //no private window so far, create new
+            chrome.windows.create({incognito:true,url:requestDetails.url}); //no private window so far, create new
         }else{
-            browser.tabs.create({active:true,url:requestDetails.url,windowId:PrivateBookmark.privateWindow}); //open new tab in existing private window
-            browser.windows.update(PrivateBookmark.privateWindow,{focused:true}); //activate private window if link is open in publick window
+            chrome.tabs.create({active:true,url:requestDetails.url,windowId:PrivateBookmark.privateWindow}); //open new tab in existing private window
+            chrome.windows.update(PrivateBookmark.privateWindow,{focused:true}); //activate private window if link is open in publick window
         }
         return {cancel: true};
 	},
@@ -64,7 +64,7 @@ const PrivateBookmark = {
 	readOptions : function(options){
 		PrivateBookmark.keyword = options.keyword || "private";
 		PrivateBookmark.tag = options.tag || "private";
-        browser.storage.local.set({
+        chrome.storage.local.set({
             "keyword": PrivateBookmark.keyword,
             "tag": PrivateBookmark.tag
         });
@@ -78,28 +78,28 @@ const PrivateBookmark = {
 	handleMessage : function(m){
 		if (typeof m["event"] != "undefined" && m.event=="optionsChanged"){
 			console.log("[PrivateBookmark] options changed - reloading");
-			browser.webRequest.onBeforeRequest.hasListener(PrivateBookmark.requestCancel);
+			chrome.webRequest.onBeforeRequest.hasListener(PrivateBookmark.requestCancel);
 			PrivateBookmark.setup();
 		}
 	},
 	
 	setup : function(){
-		const gettingOptions = browser.storage.local.get();
+		const gettingOptions = chrome.storage.local.get();
 		gettingOptions.then(PrivateBookmark.readOptions,PrivateBookmark.readOptionsError);//read options
 	},
 	
 	init : function(){
 		//add window listners
-		browser.windows.onCreated.addListener(this.windowCreated);
-		browser.windows.onRemoved.addListener(this.windowDestroyed);
+		chrome.windows.onCreated.addListener(this.windowCreated);
+		chrome.windows.onRemoved.addListener(this.windowDestroyed);
 
 		//add bookmarks listners
-		browser.bookmarks.onCreated.addListener(this.bookmarksChanged);
-		browser.bookmarks.onChanged.addListener(this.bookmarksChanged);
-		browser.bookmarks.onRemoved.addListener(this.bookmarksChanged);
-//		browser.bookmarks.onImportEnded.addListener(this.bookmarksChanged); //firefox is not supporting this
+		chrome.bookmarks.onCreated.addListener(this.bookmarksChanged);
+		chrome.bookmarks.onChanged.addListener(this.bookmarksChanged);
+		chrome.bookmarks.onRemoved.addListener(this.bookmarksChanged);
+//		chrome.bookmarks.onImportEnded.addListener(this.bookmarksChanged); //firefox is not supporting this
 
-		browser.runtime.onMessage.addListener(this.handleMessage);
+		chrome.runtime.onMessage.addListener(this.handleMessage);
 		this.setup();
 	}
 };
